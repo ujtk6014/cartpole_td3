@@ -1,6 +1,5 @@
 import numpy as np
 
-
 class OUNoise(object):
     def __init__(self, action_space, mu=0.0, theta=0.15, max_sigma=0.2, min_sigma=0.05, decay_period=100000):
         self.mu           = mu

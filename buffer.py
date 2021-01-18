@@ -30,7 +30,8 @@ class BasicBuffer:
             next_state_batch.append(next_state)
             done_batch.append(done)
 
-        return (state_batch, action_batch, reward_batch, next_state_batch, done_batch)
+        return np.array(state_batch), np.array(action_batch), np.array(reward_batch), np.array(next_state_batch), np.array(done_batch).reshape(-1,1)
+
 
     def __len__(self):
         return len(self.buffer)
