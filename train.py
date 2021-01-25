@@ -75,7 +75,7 @@ def evaluate():
         action = agent.get_action(state)
         next_state, reward, done, _ = env.step(action)
         actions.append(action)
-        env.render()
+        # env.render()
         theta.append(math.degrees(next_state[2]))
         r += reward
         state = next_state

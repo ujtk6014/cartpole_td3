@@ -25,7 +25,8 @@ def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
 
                 for step in range(max_steps):
                     pbar.set_postfix(step = step)
-                    action = agent.get_action(state, (episode + 1) * (step + 1))
+                    if step%5==0:
+                        action = agent.get_action(state, (episode + 1) * (step + 1))
                     next_state, reward, done, _ = env.step(action)
                     agent.replay_buffer.push(state, action, reward, next_state, done)
                     episode_reward += reward
