@@ -37,7 +37,7 @@ class Critic(nn.Module):
         self.linear8 = nn.Linear(300, 1)
 
         #initialization
-        self.init_w=3e-3
+        self.init_w=1e-3
         # self.init_weights(self.init_w)
    
     def init_weights(self, init_w): #2021/1/11
@@ -89,7 +89,7 @@ class Actor(nn.Module):
         self.linear3 = nn.Linear(128, self.action_dim)
 
         #initialization
-        self.init_w=3e-3
+        self.init_w=1e-3
         # self.init_weights(self.init_w)
 
     def init_weights(self, init_w): #2021/1/11
@@ -109,7 +109,7 @@ class Actor(nn.Module):
 
 class TD3Agent:
     def __init__(self, env, gamma, tau, buffer_maxlen, critic_learning_rate, actor_learning_rate, train, decay):
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
         print(self.device)
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
@@ -172,7 +172,7 @@ class TD3Agent:
         reward_batch = torch.FloatTensor(reward_batch).to(self.device)
         next_state_batch = torch.FloatTensor(next_state_batch).to(self.device)
         # masks = torch.FloatTensor(masks).to(self.device)
-        masks = torch.FloatTensor(1-masks).to(self.device)
+        masks = torch.FloatTensor(masks).to(self.device)
 
         with torch.no_grad():
             # Select action according to policy and add clipped noise
@@ -181,7 +181,7 @@ class TD3Agent:
             # next_actions = self.actor_target.forward(next_state_batch)
             next_Q1, next_Q2 = self.critic_target.forward(next_state_batch, next_actions.detach())
             next_Q = torch.min(next_Q1, next_Q2)
-            expected_Q = reward_batch + masks * self.gamma * next_Q
+            expected_Q = reward_batch + self.gamma * next_Q
 
         
         curr_Q1, curr_Q2 = self.critic.forward(state_batch, action_batch)
