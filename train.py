@@ -63,7 +63,7 @@ def evaluate():
 
 
     curr_dir = os.path.abspath(os.getcwd())
-    agent = torch.load(curr_dir + "/models/cartpole_swingup_ddpg.pkl")#, map_location = torch.device('cpu'))
+    agent = torch.load(curr_dir + "/models/cartpole_swingup_td3.pkl")#, map_location = torch.device('cpu'))
     agent.train = False
 
     state = env.reset()
