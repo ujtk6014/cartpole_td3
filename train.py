@@ -42,13 +42,14 @@ def train(batch_size=128, critic_lr=1e-3, actor_lr=1e-4, max_episodes=1000, max_
     tate = 4.0
     yoko = 6.0
     #--------------------------------------------------------------  
+    curr_dir = os.path.abspath(os.getcwd())
     plt.figure(figsize=(yoko,tate),dpi=100)
     plt.plot(episode_rewards)
     plt.xlabel("Episodes")
     plt.ylabel("Reward")
-    plt.show()
+    # plt.show()
+    plt.savefig(curr_dir + "/results/reward_hist.png")
 
-    curr_dir = os.path.abspath(os.getcwd())
     if not os.path.isdir("models"):
         os.mkdir("models")
     torch.save(agent, curr_dir + "/models/cartpole_swingup_ddpg.pkl")
