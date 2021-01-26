@@ -86,7 +86,7 @@ def evaluate():
     if not os.path.isdir("results"):
         os.mkdir("results")
 
-    plt.figure(figsize=(5,12),dpi=100)
+    plt.figure(figsize=(12,5),dpi=100)
     plt.subplot(231)
     plt.plot(theta)
     plt.title('Angle')
