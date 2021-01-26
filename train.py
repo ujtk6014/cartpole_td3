@@ -88,7 +88,7 @@ def evaluate():
 
     plt.figure(figsize=(12,5),dpi=100)
     plt.tight_layout()
-    plt.subplots_adjust(wspace=0.4, hspace=0.4)
+    plt.subplots_adjust(wspace=0.3, hspace=0.3)
     plt.subplot(231)
     plt.plot(theta)
     # plt.title('Angle')
