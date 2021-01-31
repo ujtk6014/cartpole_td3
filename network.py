@@ -103,7 +103,6 @@ class Actor(nn.Module):
         # output of tanh is bounded between -1 and 1
         # multiply by maximum action (here: 10N) in order to scale the action appropriately
         x = torch.tanh(self.linear3(x))*10
-
         return x
 
 

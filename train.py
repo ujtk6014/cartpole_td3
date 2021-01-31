@@ -59,11 +59,12 @@ def evaluate():
     # simulation of the agent solving the cartpole swing-up problem
     env = make("CartPoleSwingUpContinuous")
     # uncomment for recording a video of simulation
-    # env = wrappers.Monitor(env, './video', force=True)
+    env = wrappers.Monitor(env, './video', force=True)
 
 
     curr_dir = os.path.abspath(os.getcwd())
-    agent = torch.load(curr_dir + "/models/cartpole_swingup_td3.pkl")#, map_location = torch.device('cpu'))
+    agent = torch.load(curr_dir + "/models/cartpole_swingup_td3.pkl", map_location = torch.device('cpu'))
+    agent.device = torch.device('cpu')
     agent.train = False
 
     state = env.reset()
@@ -75,7 +76,7 @@ def evaluate():
         action = agent.get_action(state)
         next_state, reward, done, _ = env.step(action)
         actions.append(action)
-        # env.render()
+        env.render()
         theta.append(math.degrees(next_state[2]))
         r += reward
         state = next_state
