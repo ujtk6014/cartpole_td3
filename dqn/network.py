@@ -55,6 +55,7 @@ class DDQNAgent:
         self.gamma = gamma
         self.lr = learning_rate
         self.train = train
+        self.loss_for_log = []
 
         self.mid_dim = 32
         self.explore_rate = 0.5
@@ -127,7 +128,7 @@ class DDQNAgent:
         self.q_net.train()
 
         critic_obj = self.criterion(q_eval, expected_Q)
-        wandb.log({ "loss": critic_obj})
+        self.loss_for_log = critic_obj
 
         self.q_net_optimizer.zero_grad()
         critic_obj.backward()
