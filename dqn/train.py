@@ -26,8 +26,6 @@ def train():
         "buffer_maxlen": 10000,}
     )
     config = wandb.config
-    # simulation of the agent solving the spacecraft attitude control problem
-    env = gym.make("CartPole-v0")
 
     max_episodes = config.max_episodes
     max_steps = config.max_steps
@@ -37,7 +35,8 @@ def train():
     buffer_maxlen = config.buffer_maxlen
     learning_rate = config.learning_rate
 
-
+    # simulation of the agent solving the spacecraft attitude control problem
+    env = gym.make("CartPole-v0")
     agent = DDQNAgent(env, gamma, buffer_maxlen, learning_rate, True, max_episodes * max_steps)
     wandb.watch([agent.q_net,agent.q_net_target], log="all")
     #学習済みモデルを使うとき
