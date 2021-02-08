@@ -69,6 +69,7 @@ def train():
         os.mkdir("models")
     # torch.save(agent, curr_dir + "/models/ddqn_agent.pkl")
 
+
 if __name__ == '__main__':
     plt.close()
     train()
