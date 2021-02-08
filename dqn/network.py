@@ -126,6 +126,7 @@ class DDQNAgent:
         self.q_net.train()
 
         critic_obj = self.criterion(q_eval, expected_Q)
+        wandb.log({ "loss": critic_obj,}
 
         self.q_net_optimizer.zero_grad()
         critic_obj.backward()

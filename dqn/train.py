@@ -38,7 +38,7 @@ def train():
     # simulation of the agent solving the spacecraft attitude control problem
     env = gym.make("CartPole-v0")
     agent = DDQNAgent(env, gamma, buffer_maxlen, learning_rate, True, max_episodes * max_steps)
-    # wandb.watch([agent.q_net,agent.q_net_target], log="all")
+    wandb.watch([agent.q_net,agent.q_net_target], log="all")
     #学習済みモデルを使うとき
     #curr_dir = os.path.abspath(os.getcwd())
     #agent = torch.load(curr_dir + "/models/spacecraft_control_ddqn_hist.pkl")
@@ -67,7 +67,7 @@ def train():
     # plt.savefig(curr_dir + "/plot_reward_"+ date + ".png")
     if not os.path.isdir("models"):
         os.mkdir("models")
-    torch.save(agent, curr_dir + "/models/ddqn_agent.pkl")
+    # torch.save(agent, curr_dir + "/models/ddqn_agent.pkl")
 
 if __name__ == '__main__':
     plt.close()
