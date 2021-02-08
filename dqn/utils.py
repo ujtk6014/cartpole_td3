@@ -2,6 +2,7 @@ from gym import make as gym_make
 from tqdm import tqdm
 from collections import OrderedDict
 import numpy as np
+import wandb
 
 
 def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
@@ -45,6 +46,9 @@ def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
 
                     if done:
                         episode_rewards.append(episode_reward)
+                        wandb.log({ "episode reward": episode_reward,
+                                    "max steps":step+1,
+                                    "mean steps of past 10 trials": episode_10_list.mean()})
                         agent.update_td_error_memory()
                         print('%d Episode: Finished after %d steps：10試行の平均step数 = %.1lf' % (episode, step + 1, episode_10_list.mean()))
                         break

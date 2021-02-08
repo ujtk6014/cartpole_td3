@@ -7,25 +7,39 @@ import numpy as np
 from tqdm import tqdm
 import datetime
 import gym
+import wandb
 
 from network import DDQNAgent
 from utils import *
 
 
-def train(batch_size=32, learning_rate=1e-4, max_episodes=500, max_steps=200, gamma=0.99,buffer_maxlen=10000):
+def train():
+    
+    #logger
+    wandb.init(project='cartpole-continuous',
+        config={
+        "batch_size": 32,
+        "learning_rate": 1e-4,
+        "max_episodes": 500,
+        "max_steps": 200,
+        "gamma": 0.99,
+        "buffer_maxlen": 10000,}
+    )
+    config = wandb.config
     # simulation of the agent solving the spacecraft attitude control problem
     env = gym.make("CartPole-v0")
 
-    max_episodes = max_episodes
-    max_steps = max_steps
-    batch_size = batch_size
+    max_episodes = config.max_episodes
+    max_steps = config.max_steps
+    batch_size = config.batch_size
 
-    gamma = gamma
-    buffer_maxlen = buffer_maxlen
-    learning_rate = learning_rate
+    gamma = config.gamma
+    buffer_maxlen = config.buffer_maxlen
+    learning_rate = config.learning_rate
 
 
     agent = DDQNAgent(env, gamma, buffer_maxlen, learning_rate, True, max_episodes * max_steps)
+    wandb.watch([agent.q_net,agent.q_net_target], log="all")
     #学習済みモデルを使うとき
     #curr_dir = os.path.abspath(os.getcwd())
     #agent = torch.load(curr_dir + "/models/spacecraft_control_ddqn_hist.pkl")
@@ -46,7 +60,7 @@ def train(batch_size=32, learning_rate=1e-4, max_episodes=500, max_steps=200, ga
     plt.plot(episode_rewards)
     plt.xlabel("Episodes")
     plt.ylabel("Reward")
-    plt.show()
+    # plt.show()
 
     date = datetime.datetime.now()
     date = '{0:%Y%m%d}'.format(date)

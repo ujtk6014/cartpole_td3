@@ -46,7 +46,7 @@ class QNetDuel(nn.Module):
 
 class DDQNAgent:
     def __init__(self, env, gamma, buffer_maxlen, learning_rate, train, decay):
-        self.device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(self.device)
         self.env = env
         self.obs_dim = env.observation_space.shape[0]
@@ -55,18 +55,18 @@ class DDQNAgent:
         self.lr = learning_rate
         self.train = train
 
-        self.mid_dim = 128
+        self.mid_dim = 32
         self.explore_rate = 0.5
         self.softmax = nn.Softmax(dim=1)
 
         # initialize actor and critic networks
         self.q_net = QNetDuel(self.obs_dim, self.action_dim,self.mid_dim).to(self.device)
         self.q_net_optimizer = torch.optim.Adam(self.q_net.parameters(), lr=self.lr)
-        self.q_net.train()
+        # self.q_net.train()
 
         self.q_net_target = QNetDuel(self.obs_dim, self.action_dim,self.mid_dim).to(self.device)
         # self.q_net_target.load_state_dict(self.q_net.state_dict())
-        self.q_net_target.eval()
+        # self.q_net_target.eval()
 
         self.criterion = nn.SmoothL1Loss()
         self.replay_buffer = BasicBuffer(buffer_maxlen)
@@ -116,13 +116,15 @@ class DDQNAgent:
         with torch.no_grad():
             a_m = self.q_net(next_state_batch)
             a_m_ints = a_m.argmax(dim=1,keepdim=True)
-            # next_Q = self.q_net_target(next_state_batch).max(dim=1, keepdim=True)[0]
+            # next_Q = self.q_net_target(next_state_batch).maxdim=1, keepdim=True)[0]
             next_Q = self.q_net_target(next_state_batch).gather(1, a_m_ints)
             expected_Q = reward_batch + self.gamma* (1-masks) * next_Q
         
-        self.q_net.train()
         a_ints = action_batch.type(torch.long)
         q_eval = self.q_net(state_batch).gather(1, a_ints)
+
+        self.q_net.train()
+
         critic_obj = self.criterion(q_eval, expected_Q)
 
         self.q_net_optimizer.zero_grad()
@@ -171,11 +173,11 @@ class DDQNAgent:
         action_batch = torch.FloatTensor(action_batch).unsqueeze(1).to(self.device)
         reward_batch = torch.FloatTensor(reward_batch).unsqueeze(1).to(self.device)
         next_state_batch = torch.FloatTensor(next_state_batch).to(self.device)
-        masks = torch.FloatTensor(masks).to(self.device)
+        masks = torch.FloatTensor(masks).unsqueeze(1).to(self.device)
 
         with torch.no_grad():
             next_Q = self.q_net_target(next_state_batch).max(dim=1, keepdim=True)[0]
-            expected_Q = reward_batch + self.gamma * next_Q
+            expected_Q = reward_batch + self.gamma *(1-masks)* next_Q
 
         a_ints = action_batch.type(torch.long)
         q_eval = self.q_net(state_batch).gather(1, a_ints)
