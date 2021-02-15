@@ -24,7 +24,7 @@ def train():
         "max_steps": 200,
         "gamma": 0.99,
         "buffer_maxlen": 10000,
-        "prioritized_on": False,}
+        "prioritized_on": True,}
     )
     config = wandb.config
 
