@@ -46,7 +46,7 @@ class QNetDuel(nn.Module):
         return q
 
 class DDQNAgent:
-    def __init__(self, env, gamma, buffer_maxlen, learning_rate, train, decay):
+    def __init__(self, env, gamma, buffer_maxlen, learning_rate, train, decay, prioritized_on):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         print(self.device)
         self.env = env
@@ -56,6 +56,7 @@ class DDQNAgent:
         self.lr = learning_rate
         self.train = train
         self.loss_for_log = 0
+        self.prioritized_on = prioritized_on
 
         self.mid_dim = 32
         self.explore_rate = 0.5
@@ -72,8 +73,10 @@ class DDQNAgent:
 
         self.criterion = nn.SmoothL1Loss()
         self.replay_buffer = BasicBuffer(buffer_maxlen)
-        # TD誤差のメモリオブジェクトを生成
-        self.td_error_memory = TDerrorMemory(buffer_maxlen)
+        
+        # TD誤差のメモリオブジェクトを生成        
+        if self.prioritized_on:
+            self.td_error_memory = TDerrorMemory(buffer_maxlen)
     
     def get_action(self, state, episode=0):
         epsilon = 0.5 *( 1/(episode + 1) )
@@ -92,12 +95,15 @@ class DDQNAgent:
         return a_int
 
     def update(self,batch_size, episode):
-        if episode < 30:
-            transitions = self.replay_buffer.sample(batch_size)
+        if self.prioritized_on:
+            if episode < 30:
+                transitions = self.replay_buffer.sample(batch_size)
+            else:
+                # TD誤差に応じてミニバッチを取り出すに変更
+                indexes = self.td_error_memory.get_prioritized_indexes(batch_size)
+                transitions = [self.replay_buffer.memory[n] for n in indexes]
         else:
-            # TD誤差に応じてミニバッチを取り出すに変更
-            indexes = self.td_error_memory.get_prioritized_indexes(batch_size)
-            transitions = [self.replay_buffer.memory[n] for n in indexes]
+            transitions = self.replay_buffer.sample(batch_size)
 
         batch = Transition(*zip(*transitions))
         state_batch = batch.state

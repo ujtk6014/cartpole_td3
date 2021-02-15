@@ -23,7 +23,8 @@ def train():
         "max_episodes": 500,
         "max_steps": 200,
         "gamma": 0.99,
-        "buffer_maxlen": 10000,}
+        "buffer_maxlen": 10000,
+        "prioritized_on": False,}
     )
     config = wandb.config
 
@@ -34,15 +35,16 @@ def train():
     gamma = config.gamma
     buffer_maxlen = config.buffer_maxlen
     learning_rate = config.learning_rate
+    prioritized_on = config.prioritized_on
 
     # simulation of the agent solving the spacecraft attitude control problem
     env = gym.make("CartPole-v0")
-    agent = DDQNAgent(env, gamma, buffer_maxlen, learning_rate, True, max_episodes * max_steps)
+    agent = DDQNAgent(env, gamma, buffer_maxlen, learning_rate, True, max_episodes * max_steps, prioritized_on)
     wandb.watch([agent.q_net,agent.q_net_target], log="all")
     #学習済みモデルを使うとき
     #curr_dir = os.path.abspath(os.getcwd())
     #agent = torch.load(curr_dir + "/models/spacecraft_control_ddqn_hist.pkl")
-    episode_rewards = mini_batch_train(env, agent, max_episodes, max_steps, batch_size)
+    episode_rewards = mini_batch_train(env, agent, max_episodes, max_steps, batch_size, prioritized_on)
 
     #-------------------plot settings------------------------------
     plt.rcParams['font.family'] = 'Times New Roman' # font familyの設定

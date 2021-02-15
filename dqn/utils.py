@@ -5,7 +5,7 @@ import numpy as np
 import wandb
 
 
-def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
+def mini_batch_train(env, agent, max_episodes, max_steps, batch_size, prioritized_on):
     episode_rewards = []
     complete_episodes = 0
     episode_10_list = np.zeros(10)
@@ -35,8 +35,10 @@ def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
                         reward = 0
 
                     agent.replay_buffer.push(state, action, reward, next_state, done)
-                    td_error = agent.get_td_error(state, action, next_state, reward)
-                    agent.td_error_memory.push(0)
+
+                    if prioritized_on:
+                        td_error = agent.get_td_error(state, action, next_state, reward)
+                        agent.td_error_memory.push(td_error)
                     episode_reward += reward
                     state = next_state
 
@@ -50,7 +52,8 @@ def mini_batch_train(env, agent, max_episodes, max_steps, batch_size):
                                     "max steps":step+1,
                                     "mean steps of past 10 trials": episode_10_list.mean(),
                                     "loss": agent.loss_for_log})
-                        agent.update_td_error_memory()
+                        if prioritized_on:
+                            agent.update_td_error_memory()
                         print('%d Episode: Finished after %d steps：10試行の平均step数 = %.1lf' % (episode, step + 1, episode_10_list.mean()))
                         break
 
