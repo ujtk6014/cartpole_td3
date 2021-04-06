@@ -25,7 +25,7 @@ def train():
         "gamma": 0.99,
         "buffer_maxlen": 10000,
         "prioritized_on": False,
-        "State": 'angle','ang_vel'}
+        "State": 'angle,ang_vel',}
     )
     config = wandb.config
 
